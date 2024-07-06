@@ -1,4 +1,4 @@
-Augment your data (increase the number of rows and features)
+Augment your data (increase the number of samples and features)
 
 Each dataset has to fit its own story - so the exact details must be dataset-specific...
 An example of a Caesarian Section Classification Dataset is available in the main
