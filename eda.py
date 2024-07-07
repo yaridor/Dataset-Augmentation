@@ -25,36 +25,44 @@ def display_basic_statistics(df):
 
 
 def plot_distributions(df):
-    for column in df.columns:
-        if pd.api.types.is_numeric_dtype(df[column]):
-            plt.figure(figsize=(10, 6))
-            sns.histplot(df[column], kde=True, bins=30)
-            plt.title(f'Distribution of {column}')
-            plt.show()
+    df = df.select_dtypes(include=[np.number])
+    num_rows = int(np.ceil(len(df.columns) ** 0.5))
+    num_cols = int(np.ceil(len(df.columns) / num_rows))
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(10 * num_cols, 6 * num_rows))
+    for ax, column in zip(axes.flat, df.columns):
+        if np.unique(df[column]).shape[0] < 5:
+            sns.histplot(df[column], kde=False, bins=30, ax=ax)
+        else:
+            sns.histplot(df[column], kde=True, bins=30, ax=ax)
+        ax.set_title(f'Distribution of {column}')
+    plt.tight_layout()
+    plt.show()
 
 
 def plot_scatter_matrix(df):
     num_cols = df.select_dtypes(include=[np.number]).columns
     pd.plotting.scatter_matrix(df[num_cols], figsize=(15, 10), diagonal='kde')
     plt.suptitle('Scatter Matrix for Numeric Features')
+    plt.tight_layout()
     plt.show()
 
 
 def plot_boxplots(df):
-    for column in df.columns:
-        if pd.api.types.is_numeric_dtype(df[column]):
-            plt.figure(figsize=(10, 6))
-            sns.boxplot(data=df[column])
-            plt.title(f'Boxplot of {column}')
-            plt.show()
+    df = df.select_dtypes(include=[np.number])
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=df)
+    plt.title(f'Boxplot')
+    plt.tight_layout()
+    plt.show()
 
 
-def plot_countplots(df):
+def plot_count_plots(df):
     for column in df.columns:
         if isinstance(df[column].dtype, pd.CategoricalDtype) or df[column].dtype == object:
             plt.figure(figsize=(10, 6))
             sns.countplot(y=df[column], order=df[column].value_counts().index)
             plt.title(f'Count plot of {column}')
+            plt.tight_layout()
             plt.show()
 
 
@@ -67,15 +75,14 @@ def detect_outliers(df, threshold=3):
     return outliers
 
 
-def main():
-    data_path = "data.csv"
-    data = pd.read_csv(data_path)
-
+def exploratory_data_analysis(data):
     display_basic_statistics(data)
     plot_distributions(data)
 
     print("Pair plot for numeric features:")
     sns.pairplot(data.select_dtypes(include=[np.number]))
+    plt.title('Pair Plot for Numeric Features')
+    plt.tight_layout()
     plt.show()
 
     # Correlation matrix
@@ -87,6 +94,7 @@ def main():
     plt.figure(figsize=(12, 8))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
     plt.title('Correlation Matrix Heatmap')
+    plt.tight_layout()
     plt.show()
 
     print("Plotting scatter matrix for numeric features:")
@@ -96,7 +104,7 @@ def main():
     plot_boxplots(data)
 
     print("Plotting count plots for categorical features:")
-    plot_countplots(data)
+    plot_count_plots(data)
 
     print("Detecting outliers using Z-score method:")
     outliers = detect_outliers(data)
@@ -107,6 +115,14 @@ def main():
     print(f"Dataset contains {data.shape[0]} rows and {data.shape[1]} columns.")
     print(f"Numeric columns: {data.select_dtypes(include=[np.number]).columns.tolist()}")
     print(f"Categorical columns: {data.select_dtypes(include=['object']).columns.tolist()}")
+
+
+def main():
+    # data_path = "Output Data/caesarian_original.csv"
+    data_path = "Output Data/caesarian.csv"
+    data = pd.read_csv(data_path)
+
+    exploratory_data_analysis(data)
 
 
 if __name__ == '__main__':
