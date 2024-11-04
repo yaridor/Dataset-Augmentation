@@ -167,16 +167,22 @@ def add_missing_data(data: pd.DataFrame, column: str, missing_rate: float,
 # </editor-fold>
 
 def main():
+    """
     data, description = read_from_uci(887)
     data.rename(columns={"RIAGENDR": "Gender", "PAQ605": "Sport Activity", "BMXBMI": "BMI", "LBXGLU": "Glucose",
                          "DIQ010": "Diabetic", "LBXGLT": "Oral", "LBXIN": "Insulin Level",
                          "age_group": "Age Group"}, inplace=True)
     print(tabulate(data.head(50), headers="keys", tablefmt="psql"))
-
+    """
     data_path = "Original Data/caesarian.csv.arff"
     data = read_arff(data_path)
+    
+    
+    print(tabulate(data.head(50), headers="keys", tablefmt="psql"))
 
     data.to_csv("Output Data/caesarian_original.csv", index=False)
+    
+    print(data.info)
 
     # Restore possible values for each feature
     delivery_time = {
